@@ -1,0 +1,84 @@
+// ©AngelaMos | 2026
+// CustomizeBar.module.scss
+
+.bar {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 24px);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 55%);
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  color: var(--fg-2);
+}
+
+.label {
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-label);
+  color: var(--fg-1);
+}
+
+.hint {
+  color: var(--fg-3);
+}
+
+.hiddenGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.hiddenLabel {
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-label);
+  font-size: var(--type-meta);
+}
+
+.chip,
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  background: var(--bg-row-hover);
+  border: 1px solid var(--fg-4);
+  border-radius: 6px;
+  color: var(--fg-2);
+  font-family: var(--font-sans);
+  font-size: var(--type-meta);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--fg-1);
+    border-color: var(--rule-strong);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--fg-2);
+    outline-offset: 1px;
+  }
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.done {
+  color: var(--fg-1);
+  border-color: var(--rule-strong);
+}

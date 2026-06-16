@@ -1,0 +1,165 @@
+// ©AngelaMos | 2026
+// CountryPanel.module.scss
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.modalContent {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: slide-up 0.2s ease-out forwards;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface-2);
+}
+
+.modalTitle {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg-1);
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: var(--fg-3);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--bg-surface-3);
+    color: var(--fg-1);
+  }
+}
+
+.modalBody {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.emptyState {
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-2);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  background: var(--bg-surface-3);
+  color: var(--fg-1);
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 10px;
+}
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--fg-1);
+  line-height: 1.4;
+
+  a {
+    color: var(--accent, var(--fg-1));
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.techBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg-2);
+  border: 1px solid var(--fg-4);
+  line-height: 1;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  vertical-align: middle;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--amber);
+    border-color: var(--amber);
+  }
+}

@@ -1,0 +1,73 @@
+revil:
+  - T1486
+  - T1078
+lockbit:
+  - T1486
+  - T1078
+  - T1190
+  - T1059
+blackbasta:
+  - T1486
+  - T1212
+cl0p:
+  - T1486
+  - T1190
+  - T1059
+play:
+  - T1486
+  - T1190
+alphv:
+  - T1486
+  - T1078
+  - T1562
+blackcat:
+  - T1486
+  - T1078
+  - T1562
+akira:
+  - T1486
+  - T1078
+lockbit3:
+  - T1486
+  - T1078
+  - T1190
+  - T1059
+shinyhunters:
+  - T1530
+  - T1078
+  - T1119
+safepay:
+  - T1486
+  - T1078
+incransom:
+  - T1486
+  - T1566
+  - T1133
+  - T1059
+  - T1041
+nova:
+  - T1486
+  - T1078
+qilin:
+  - T1486
+  - T1078
+  - T1190
+payload:
+  - T1486
+  - T1059
+shadowbyt3$:
+  - T1486
+fulcrumsec:
+  - T1486
+cloak:
+  - T1486
+  - T1078
+icarus:
+  - T1486
+aurora:
+  - T1486
+nightspire:
+  - T1486
+dragonforce:
+  - T1486
+  - T1078

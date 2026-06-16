@@ -1,0 +1,13 @@
+// ©AngelaMos | 2026
+// SortablePanel.module.scss
+
+.item {
+  position: relative;
+}
+
+// In customize mode, give each panel a faint dashed frame so it reads as a
+// movable unit.
+.customizing {
+  outline: 1px dashed var(--fg-4);
+  outline-offset: -1px;
+}

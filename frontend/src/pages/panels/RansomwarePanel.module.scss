@@ -1,0 +1,124 @@
+// ©AngelaMos | 2026
+// RansomwarePanel.module.scss
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table thead th {
+  font-size: var(--type-label);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  text-align: left;
+  padding: var(--row-py) var(--row-px);
+  border-bottom: 1px solid var(--fg-4);
+  font-weight: 400;
+}
+
+.table tbody td {
+  padding: var(--row-py) var(--row-px);
+  font-size: var(--type-body);
+  color: var(--fg-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-row-hover);
+}
+
+.victim {
+  font-family: var(--font-mono);
+  width: 50%;
+}
+
+.victimTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sparklineWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  height: 12px;
+}
+
+.walletIcon {
+  font-size: 9px;
+  color: var(--amber);
+  font-weight: bold;
+}
+
+.group {
+  color: var(--fg-2);
+  width: 25%;
+  vertical-align: top;
+}
+
+.groupName {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.techniques {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.techBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg-2);
+  border: 1px solid var(--fg-4);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.techBadge:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.cc {
+  color: var(--fg-3);
+  width: 12%;
+}
+
+.ago {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-3);
+  width: 13%;
+  text-align: right;
+}
+
+.flash {
+  animation: row-flash 600ms ease-out;
+}
+
+@keyframes row-flash {
+  0% {
+    background: var(--fg-4);
+  }
+
+  100% {
+    background: transparent;
+  }
+}

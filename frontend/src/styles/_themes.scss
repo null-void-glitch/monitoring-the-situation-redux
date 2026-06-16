@@ -1,0 +1,407 @@
+// ===================
+// © AngelaMos | 2026
+// _themes.scss
+// ===================
+//
+// Color schemes as CSS-custom-property overrides. The base palette lives in
+// _tokens.scss `:root`; that is the default "Glow" theme. Each block below is
+// scoped by `:root[data-theme="<id>"]` (specificity 0,2,0 — always wins over
+// the bare `:root`). The theme store (stores/theme.ts) flips `data-theme` on
+// <html>. Only the variables that differ from Glow are overridden.
+
+// ── Glow Red ──────────────────────────────────────────────────
+// Same warm-dark base as Glow, but the "live / healthy" accent and chrome glow
+// red instead of green. Categorical (taxonomy) accents are kept intact.
+:root[data-theme='glow-red'] {
+  --ok:           #f0493d;   // live / healthy / busy now reads red
+  --rule-strong:  #5a3a3a;   // panel header hairline, faint red tint
+  --accent-iss:     #f0493d; // live ISS track
+  --accent-spacewx: #f0493d; // live space weather
+  --globe-outline:  #a13434; // red country outlines on the globe
+}
+
+// ── High Contrast ─────────────────────────────────────────────
+// Maximum contrast for glare-heavy rooms / accessibility: pure-black base,
+// near-white text, stronger borders, brighter accents.
+:root[data-theme='high-contrast'] {
+  --bg:           #000000;
+  --bg-panel:     #0b0b0b;
+  --bg-row-hover: #242424;
+
+  --fg-1: #ffffff;
+  --fg-2: #e6e2d8;
+  --fg-3: #b4ac9e;
+  --fg-4: #6a6a6a;
+
+  --rule-strong: #8c8c8c;
+
+  --ok:    #5cff8f;
+  --amber: #ffb020;
+
+  --accent-bgp:        #ff5a5a;
+  --accent-outage:     #ffa64d;
+  --accent-kev:        #f070ff;
+  --accent-ransomware: #ffe14d;
+  --accent-dshield:    #5ad1ff;
+  --accent-quake:      #c0a6ff;
+  --accent-iss:        #5cff8f;
+  --accent-spacewx:    #5cff8f;
+  --accent-cve:        #f070ff;
+  --accent-wiki:       #4ff0dc;
+  --accent-btc:        #ffb04d;
+  --accent-eth:        #a6b8ff;
+
+  --globe-outline:     #7a7a7a; // brighter outlines for contrast
+}
+
+// ── Colorblind-safe ───────────────────────────────────────────
+// Okabe-Ito palette (deuteranopia/protanopia-distinguishable). The categorical
+// accents carry taxonomy (which event type), so they are the important remap —
+// the most-confusable red/green pair is split across vermillion and blue.
+:root[data-theme='colorblind'] {
+  --ok:    #009e73;   // bluish green — live / healthy
+  --amber: #e69f00;   // orange — stale / anomaly
+
+  --accent-bgp:        #d55e00;  // vermillion — hijacks
+  --accent-outage:     #e69f00;  // orange — outages
+  --accent-kev:        #cc79a7;  // reddish purple — exploited CVEs
+  --accent-ransomware: #f0e442;  // yellow — victims
+  --accent-dshield:    #56b4e9;  // sky blue — mass scan
+  --accent-quake:      #0072b2;  // blue — earthquakes
+  --accent-iss:        #009e73;  // bluish green — ISS / live
+  --accent-spacewx:    #009e73;  // bluish green — space weather
+  --accent-cve:        #cc79a7;  // reddish purple — CVE velocity
+  --accent-wiki:       #56b4e9;  // sky blue — news
+  --accent-btc:        #e69f00;  // orange — bitcoin
+  --accent-eth:        #0072b2;  // blue — ethereum
+}
+
+// ── Cyber Neon ───────────────────────────────────────────────
+:root[data-theme='cyber-neon'] {
+  --bg:           #2b2d42;
+  --bg-panel:     #1f2130;
+  --bg-row-hover: #363952;
+  --ok:           #0ff0fc;
+  --amber:        #fbff12;
+  --accent-bgp:   #ff2a6d;
+  --accent-outage:#fbff12;
+  --accent-kev:   #05d9e8;
+  --accent-ransomware: #fbff12;
+  --accent-dshield:    #0ff0fc;
+  --accent-quake:      #ff2a6d;
+  --accent-iss:        #0ff0fc;
+  --accent-spacewx:    #0ff0fc;
+  --accent-cve:        #05d9e8;
+  --accent-wiki:       #05d9e8;
+  --accent-btc:        #fbff12;
+  --accent-eth:        #0ff0fc;
+  --globe-outline:     #424561;
+}
+
+// ── Synthwave Night ──────────────────────────────────────────
+:root[data-theme='synthwave-night'] {
+  --bg:           #0b1020;
+  --bg-panel:     #1a1c40;
+  --bg-row-hover: #212551;
+  --ok:           #00f5ff;
+  --amber:        #ff4ecd;
+  --accent-bgp:   #ff4ecd;
+  --accent-outage:#ff4ecd;
+  --accent-kev:   #7b2cff;
+  --accent-ransomware: #ff4ecd;
+  --accent-dshield:    #00f5ff;
+  --accent-quake:      #7b2cff;
+  --accent-iss:        #00f5ff;
+  --accent-spacewx:    #00f5ff;
+  --accent-cve:        #7b2cff;
+  --accent-wiki:       #00f5ff;
+  --accent-btc:        #ff4ecd;
+  --accent-eth:        #7b2cff;
+  --globe-outline:     #25295c;
+}
+
+// ── Retro Gaming ─────────────────────────────────────────────
+:root[data-theme='retro-gaming'] {
+  --bg:           #101020;
+  --bg-panel:     #18182d;
+  --bg-row-hover: #22223e;
+  --ok:           #12e2a3;
+  --amber:        #ffbe0b;
+  --accent-bgp:   #ff006e;
+  --accent-outage:#ffbe0b;
+  --accent-kev:   #2ce8f5;
+  --accent-ransomware: #ffbe0b;
+  --accent-dshield:    #12e2a3;
+  --accent-quake:      #2ce8f5;
+  --accent-iss:        #12e2a3;
+  --accent-spacewx:    #12e2a3;
+  --accent-cve:        #2ce8f5;
+  --accent-wiki:       #12e2a3;
+  --accent-btc:        #ffbe0b;
+  --accent-eth:        #2ce8f5;
+  --globe-outline:     #2c2c4d;
+}
+
+// ── Sci-Fi Synth ─────────────────────────────────────────────
+:root[data-theme='scifi-synth'] {
+  --bg:           #231942;
+  --bg-panel:     #2d2155;
+  --bg-row-hover: #38296a;
+  --ok:           #00f5d4;
+  --amber:        #fee440;
+  --accent-bgp:   #f15bb5;
+  --accent-outage:#fee440;
+  --accent-kev:   #00bbf9;
+  --accent-ransomware: #fee440;
+  --accent-dshield:    #00f5d4;
+  --accent-quake:      #00bbf9;
+  --accent-iss:        #00f5d4;
+  --accent-spacewx:    #00f5d4;
+  --accent-cve:        #00bbf9;
+  --accent-wiki:       #00f5d4;
+  --accent-btc:        #fee440;
+  --accent-eth:        #00bbf9;
+  --globe-outline:     #423277;
+}
+
+// ── Futuristic HUD ───────────────────────────────────────────
+:root[data-theme='futuristic-hud'] {
+  --bg:           #11151c;
+  --bg-panel:     #181d26;
+  --bg-row-hover: #222935;
+  --ok:           #30f2f2;
+  --amber:        #ff9f1c;
+  --accent-bgp:   #ff3377;
+  --accent-outage:#ff9f1c;
+  --accent-kev:   #4cffdf;
+  --accent-ransomware: #ff9f1c;
+  --accent-dshield:    #30f2f2;
+  --accent-quake:      #4cffdf;
+  --accent-iss:        #30f2f2;
+  --accent-spacewx:    #30f2f2;
+  --accent-cve:        #4cffdf;
+  --accent-wiki:       #30f2f2;
+  --accent-btc:        #ff9f1c;
+  --accent-eth:        #4cffdf;
+  --globe-outline:     #283141;
+}
+
+// ── Dark Tech ────────────────────────────────────────────────
+:root[data-theme='dark-tech'] {
+  --bg:           #0b0f16;
+  --bg-panel:     #151a24;
+  --bg-row-hover: #1c2331;
+  --ok:           #00c896;
+  --amber:        #00e5ff;
+  --accent-bgp:   #00e5ff;
+  --accent-outage:#00e5ff;
+  --accent-kev:   #008b8b;
+  --accent-ransomware: #00e5ff;
+  --accent-dshield:    #00c896;
+  --accent-quake:      #008b8b;
+  --accent-iss:        #00c896;
+  --accent-spacewx:    #00c896;
+  --accent-cve:        #008b8b;
+  --accent-wiki:       #00c896;
+  --accent-btc:        #00e5ff;
+  --accent-eth:        #008b8b;
+  --globe-outline:     #21293a;
+}
+
+// ── B2B Minimal ──────────────────────────────────────────────
+:root[data-theme='b2b-minimal'] {
+  --bg:           #020617;
+  --bg-panel:     #151b2f;
+  --bg-row-hover: #1e2641;
+  --ok:           #00ffc6;
+  --amber:        #00bcd4;
+  --accent-bgp:   #00bcd4;
+  --accent-outage:#00bcd4;
+  --accent-kev:   #005f73;
+  --accent-ransomware: #00bcd4;
+  --accent-dshield:    #00ffc6;
+  --accent-quake:      #005f73;
+  --accent-iss:        #00ffc6;
+  --accent-spacewx:    #00ffc6;
+  --accent-cve:        #005f73;
+  --accent-wiki:       #00ffc6;
+  --accent-btc:        #00bcd4;
+  --accent-eth:        #005f73;
+  --globe-outline:     #263152;
+}
+
+// ── Neutral Cyber ────────────────────────────────────────────
+:root[data-theme='neutral-cyber'] {
+  --bg:           #0b1120;
+  --bg-panel:     #1f2933;
+  --bg-row-hover: #293644;
+  --ok:           #00f5ff;
+  --amber:        #6fffe9;
+  --accent-bgp:   #6fffe9;
+  --accent-outage:#6fffe9;
+  --accent-kev:   #495867;
+  --accent-ransomware: #6fffe9;
+  --accent-dshield:    #00f5ff;
+  --accent-quake:      #495867;
+  --accent-iss:        #00f5ff;
+  --accent-spacewx:    #00f5ff;
+  --accent-cve:        #495867;
+  --accent-wiki:       #00f5ff;
+  --accent-btc:        #6fffe9;
+  --accent-eth:        #495867;
+  --globe-outline:     #354455;
+}
+
+// ── Cyber Breach ─────────────────────────────────────────────
+:root[data-theme='cyber-breach'] {
+  --bg:           #0c0f16;
+  --bg-panel:     #212529;
+  --bg-row-hover: #2c3237;
+  --ok:           #1dd3b0;
+  --amber:        #ff6b6b;
+  --accent-bgp:   #ff3366;
+  --accent-outage:#ff6b6b;
+  --accent-kev:   #ff3366;
+  --accent-ransomware: #ff6b6b;
+  --accent-dshield:    #1dd3b0;
+  --accent-quake:      #ff3366;
+  --accent-iss:        #1dd3b0;
+  --accent-spacewx:    #1dd3b0;
+  --accent-cve:        #ff3366;
+  --accent-wiki:       #1dd3b0;
+  --accent-btc:        #ff6b6b;
+  --accent-eth:        #ff3366;
+  --globe-outline:     #3e454d;
+}
+
+// ── Cloud Computing ──────────────────────────────────────────
+:root[data-theme='cloud-computing'] {
+  --bg:           #020617;
+  --bg-panel:     #111827;
+  --bg-row-hover: #192338;
+  --ok:           #00f5d4;
+  --amber:        #48cae4;
+  --accent-bgp:   #48cae4;
+  --accent-outage:#48cae4;
+  --accent-kev:   #5a4fcf;
+  --accent-ransomware: #48cae4;
+  --accent-dshield:    #00f5d4;
+  --accent-quake:      #5a4fcf;
+  --accent-iss:        #00f5d4;
+  --accent-spacewx:    #00f5d4;
+  --accent-cve:        #5a4fcf;
+  --accent-wiki:       #00f5d4;
+  --accent-btc:        #48cae4;
+  --accent-eth:        #5a4fcf;
+  --globe-outline:     #22304d;
+}
+
+// ── Cozy Pastel ──────────────────────────────────────────────
+:root[data-theme='cozy-pastel'] {
+  --bg:           #2b2d42;
+  --bg-panel:     #353852;
+  --bg-row-hover: #404463;
+  --ok:           #caffbf;
+  --amber:        #9bf6ff;
+  --accent-bgp:   #ffd6ff;
+  --accent-outage:#9bf6ff;
+  --accent-kev:   #bdb2ff;
+  --accent-ransomware: #9bf6ff;
+  --accent-dshield:    #caffbf;
+  --accent-quake:      #bdb2ff;
+  --accent-iss:        #caffbf;
+  --accent-spacewx:    #caffbf;
+  --accent-cve:        #bdb2ff;
+  --accent-wiki:       #caffbf;
+  --accent-btc:        #9bf6ff;
+  --accent-eth:        #bdb2ff;
+  --globe-outline:     #4b4f73;
+}
+
+// ── Light Cyber ──────────────────────────────────────────────
+:root[data-theme='light-cyber'] {
+  --bg:           #343a40;
+  --bg-panel:     #424a52;
+  --bg-row-hover: #4f5861;
+  --ok:           #e0fbfc;
+  --amber:        #ffb3c6;
+  --accent-bgp:   #ffb3c6;
+  --accent-outage:#ffb3c6;
+  --accent-kev:   #ffc6ff;
+  --accent-ransomware: #ffb3c6;
+  --accent-dshield:    #e0fbfc;
+  --accent-quake:      #ffc6ff;
+  --accent-iss:        #e0fbfc;
+  --accent-spacewx:    #e0fbfc;
+  --accent-cve:        #ffc6ff;
+  --accent-wiki:       #e0fbfc;
+  --accent-btc:        #ffb3c6;
+  --accent-eth:        #ffc6ff;
+  --globe-outline:     #5e6973;
+}
+
+// ── Welcoming Cyber ──────────────────────────────────────────
+:root[data-theme='welcoming-cyber'] {
+  --bg:           #1a1b27;
+  --bg-panel:     #252636;
+  --bg-row-hover: #2f3145;
+  --ok:           #affcfd;
+  --amber:        #ffc8dd;
+  --accent-bgp:   #ffafcc;
+  --accent-outage:#ffc8dd;
+  --accent-kev:   #cdb4db;
+  --accent-ransomware: #ffc8dd;
+  --accent-dshield:    #affcfd;
+  --accent-quake:      #cdb4db;
+  --accent-iss:        #affcfd;
+  --accent-spacewx:    #affcfd;
+  --accent-cve:        #cdb4db;
+  --accent-wiki:       #affcfd;
+  --accent-btc:        #ffc8dd;
+  --accent-eth:        #cdb4db;
+  --globe-outline:     #3f415c;
+}
+
+// ── Clean UI ─────────────────────────────────────────────────
+:root[data-theme='clean-ui'] {
+  --bg:           #2f3b52;
+  --bg-panel:     #3c4a66;
+  --bg-row-hover: #475878;
+  --ok:           #c4fff9;
+  --amber:        #ffe5f1;
+  --accent-bgp:   #ffe5f1;
+  --accent-outage:#ffe5f1;
+  --accent-kev:   #f1f0ff;
+  --accent-ransomware: #ffe5f1;
+  --accent-dshield:    #c4fff9;
+  --accent-quake:      #f1f0ff;
+  --accent-iss:        #c4fff9;
+  --accent-spacewx:    #c4fff9;
+  --accent-cve:        #f1f0ff;
+  --accent-wiki:       #c4fff9;
+  --accent-btc:        #ffe5f1;
+  --accent-eth:        #f1f0ff;
+  --globe-outline:     #56698f;
+}
+
+// ── Hacker Mode ──────────────────────────────────────────────
+:root[data-theme='hacker-mode'] {
+  --bg:           #010103;
+  --bg-panel:     #252a34;
+  --bg-row-hover: #313745;
+  --ok:           #08d9d6;
+  --amber:        #ff2e63;
+  --accent-bgp:   #ff2e63;
+  --accent-outage:#ff2e63;
+  --accent-kev:   #00f5ff;
+  --accent-ransomware: #ff2e63;
+  --accent-dshield:    #08d9d6;
+  --accent-quake:      #00f5ff;
+  --accent-iss:        #08d9d6;
+  --accent-spacewx:    #08d9d6;
+  --accent-cve:        #00f5ff;
+  --accent-wiki:       #08d9d6;
+  --accent-btc:        #ff2e63;
+  --accent-eth:        #00f5ff;
+  --globe-outline:     #424b5d;
+}

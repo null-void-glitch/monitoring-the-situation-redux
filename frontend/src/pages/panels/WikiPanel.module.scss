@@ -1,0 +1,187 @@
+// ©AngelaMos | 2026
+// WikiPanel.module.scss
+
+.list {
+  padding: 0 8px 4px;
+}
+
+.empty {
+  padding: var(--row-py) 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-body);
+  color: var(--fg-3);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: var(--row-py) 0;
+  border-bottom: 1px solid var(--fg-4);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.headline {
+  font-size: var(--type-body);
+  color: var(--fg-1);
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  &[href] {
+    text-decoration: none;
+
+    &:hover {
+      color: var(--fg-1);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 1px solid var(--fg-2);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.ts {
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  color: var(--fg-3);
+  flex-shrink: 0;
+  letter-spacing: var(--letter-spacing-label);
+}
+
+.headerRefresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: transparent;
+  border: 0;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--fg-1);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--fg-2);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 24px;
+}
+
+.modalContent {
+  background: var(--bg);
+  border: 1px solid var(--fg-4);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--fg-4);
+}
+
+.modalTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--fg-1);
+}
+
+.modalClose {
+  background: transparent;
+  border: none;
+  color: var(--fg-3);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--fg-1);
+  }
+}
+
+.modalBody {
+  padding: 0 20px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sourceGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.sourceGroup:first-child {
+  margin-top: 12px;
+}
+
+.sourceTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--type-label);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-label);
+  color: var(--fg-3);
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 4px;
+}
+
+.modalList {
+  display: flex;
+  flex-direction: column;
+}
