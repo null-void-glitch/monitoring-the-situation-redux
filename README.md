@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://github.com/null-void-glitch/monitor-the-situation-edited/blob/main/Screenshot_20260616_215433.png">
+  <img src="https://github.com/null-void-glitch/monitoriing-the-situation-redux/blob/main/Screenshot_20260616_215433.png?raw=true">
 </p>
 
 
