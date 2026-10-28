@@ -34,12 +34,7 @@ export function SortablePanel({ id }: { id: PanelId }): React.ReactElement {
     .join(' ')
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={className}
-      data-panel-id={id}
-    >
+    <div ref={setNodeRef} style={style} className={className} data-panel-id={id}>
       <PanelChromeContext.Provider
         value={{
           customizing,

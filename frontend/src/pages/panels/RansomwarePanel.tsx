@@ -78,7 +78,10 @@ export function RansomwarePanel(): React.ReactElement {
                 <td className={styles.victim} title={v.post_title}>
                   <div className={styles.victimTitle}>{v.post_title}</div>
                   {v.wallet_txs && v.wallet_txs.length > 0 && (
-                    <div className={styles.sparklineWrap} title={`Wallet: ${v.wallet_address}`}>
+                    <div
+                      className={styles.sparklineWrap}
+                      title={`Wallet: ${v.wallet_address}`}
+                    >
                       <span className={styles.walletIcon}>₿</span>
                       <Sparkline data={v.wallet_txs} />
                     </div>
@@ -88,13 +91,13 @@ export function RansomwarePanel(): React.ReactElement {
                   <span className={styles.groupName}>{v.group_name}</span>
                   {v.techniques && v.techniques.length > 0 && (
                     <div className={styles.techniques}>
-                      {v.techniques.map(t => (
-                        <a 
-                          key={t} 
+                      {v.techniques.map((t) => (
+                        <a
+                          key={t}
                           href={`https://attack.mitre.org/techniques/${t}/`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={styles.techBadge} 
+                          className={styles.techBadge}
                           title={`MITRE ATT&CK Technique: ${t}`}
                         >
                           {t}
@@ -134,24 +137,48 @@ function Sparkline({ data }: { data: number[] }) {
   const max = Math.max(...data, 1)
   const width = 40
   const height = 10
-  
+
   if (data.length === 1) {
     return (
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
-        <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="var(--amber)" strokeWidth="1" />
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        style={{ overflow: 'visible' }}
+      >
+        <line
+          x1="0"
+          y1={height / 2}
+          x2={width}
+          y2={height / 2}
+          stroke="var(--amber)"
+          strokeWidth="1"
+        />
       </svg>
     )
   }
 
-  const points = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * width
-    const y = height - (v / max) * height
-    return `${x},${y}`
-  }).join(' ')
+  const points = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * width
+      const y = height - (v / max) * height
+      return `${x},${y}`
+    })
+    .join(' ')
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
-      <polyline points={points} fill="none" stroke="var(--amber)" strokeWidth="1" />
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ overflow: 'visible' }}
+    >
+      <polyline
+        points={points}
+        fill="none"
+        stroke="var(--amber)"
+        strokeWidth="1"
+      />
     </svg>
   )
 }

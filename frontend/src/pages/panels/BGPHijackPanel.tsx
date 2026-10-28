@@ -74,7 +74,11 @@ export function BGPHijackPanel(): React.ReactElement {
             <tr>
               <td
                 colSpan={5}
-                style={{ textAlign: 'center', color: 'var(--fg-3)', padding: 'var(--row-py)' }}
+                style={{
+                  textAlign: 'center',
+                  color: 'var(--fg-3)',
+                  padding: 'var(--row-py)',
+                }}
               >
                 No active hijacks
               </td>
@@ -89,10 +93,15 @@ export function BGPHijackPanel(): React.ReactElement {
                   <td className={styles.isp} title={h.enrichment?.isp ?? ''}>
                     {h.enrichment?.isp ?? '—'}
                   </td>
-                  <td className={styles.pfx} title={(h.prefixes ?? []).join(', ')}>
+                  <td
+                    className={styles.pfx}
+                    title={(h.prefixes ?? []).join(', ')}
+                  >
                     {fmtPfx(h.prefixes)}
                   </td>
-                  <td className={styles.ago}>{fmtAgo(h.max_msg_ts || h.min_hijack_ts, now)}</td>
+                  <td className={styles.ago}>
+                    {fmtAgo(h.max_msg_ts || h.min_hijack_ts, now)}
+                  </td>
                 </tr>
               )
             })

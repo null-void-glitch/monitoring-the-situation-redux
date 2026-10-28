@@ -44,6 +44,8 @@ type CollectorsConfig struct {
 	ISS        ISSConfig       `koanf:"iss"`
 	RSS        RSSConfig       `koanf:"rss"`
 	Tor        TorConfig       `koanf:"tor"`
+	URLhaus    SourceConfig    `koanf:"urlhaus"`
+	MalwareBazaar SourceConfig `koanf:"malwarebazaar"`
 }
 
 type TorConfig struct {
@@ -340,12 +342,16 @@ func loadDefaults(k *koanf.Koanf) error {
 		"collectors.rss.interval":           "5m",
 		"collectors.rss.feeds": []map[string]any{
 			{"name": "BleepingComputer", "url": "https://www.bleepingcomputer.com/feed/"},
-			{"name": "Reuters", "url": "https://rss.app/feeds/7KeRlbOD7PMp24RE.xml"},
+			{"name": "BBC News", "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
 			{"name": "Google Project Zero", "url": "https://googleprojectzero.blogspot.com/feeds/posts/default"},
 		},
 		"collectors.tor.enabled":  true,
 		"collectors.tor.interval": "30m",
 		"collectors.tor.url":      "https://check.torproject.org/torbulkexitlist",
+		"collectors.urlhaus.enabled":       true,
+		"collectors.urlhaus.interval":      "10m",
+		"collectors.malwarebazaar.enabled": true,
+		"collectors.malwarebazaar.interval": "10m",
 	}
 
 	for key, value := range defaults {

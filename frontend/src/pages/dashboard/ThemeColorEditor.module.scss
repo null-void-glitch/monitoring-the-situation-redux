@@ -1,0 +1,115 @@
+// ©AngelaMos | 2026
+// ThemeColorEditor.module.scss
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 2px 6px;
+  border-bottom: 1px solid var(--fg-4);
+  margin-bottom: 6px;
+}
+
+.title {
+  flex: 1;
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  font-weight: 600;
+  text-align: center;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--fg-3);
+  cursor: pointer;
+  font-size: 13px;
+
+  &:hover {
+    color: var(--fg-1);
+    background: var(--bg-row-hover);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--fg-2);
+    outline-offset: 1px;
+  }
+}
+
+.list {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.group {
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.groupLabel {
+  padding: 4px 8px 2px;
+  color: var(--fg-3);
+  font-family: var(--font-sans);
+  font-size: var(--type-col);
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-row-hover);
+  }
+}
+
+.rowLabel {
+  flex: 1;
+  overflow: hidden;
+  color: var(--fg-2);
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowValue {
+  color: var(--fg-3);
+  font-family: var(--font-mono);
+  font-size: var(--type-col);
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--fg-4);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}

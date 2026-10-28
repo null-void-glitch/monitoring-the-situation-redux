@@ -23,7 +23,10 @@ export const useRansomwareStore = create<RansomwareStore>((set) => ({
       const key = victimKey(item)
       const filtered = s.items.filter((i) => victimKey(i) !== key)
       const newItems = [item, ...filtered]
-      newItems.sort((a, b) => new Date(b.discovered).getTime() - new Date(a.discovered).getTime())
+      newItems.sort(
+        (a, b) =>
+          new Date(b.discovered).getTime() - new Date(a.discovered).getTime()
+      )
       return { items: newItems.slice(0, RANSOMWARE_CAP) }
     }),
   clear: () => set({ items: [] }),

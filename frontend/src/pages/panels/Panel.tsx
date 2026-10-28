@@ -26,6 +26,8 @@ export type PanelAccent =
   | 'wiki'
   | 'btc'
   | 'eth'
+  | 'urlhaus'
+  | 'malwarebazaar'
 
 export interface PanelProps {
   title: string
@@ -71,6 +73,8 @@ export function Panel({
     wiki: styles.accentWiki,
     btc: styles.accentBtc,
     eth: styles.accentEth,
+    urlhaus: styles['accentUrlhaus'] || '',
+    malwarebazaar: styles['accentMalwarebazaar'] || '',
   }
   const accentClass = accent ? ACCENT_CLASS[accent] : ''
   const panelClass = [

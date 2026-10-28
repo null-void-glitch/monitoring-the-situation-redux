@@ -18,6 +18,32 @@ export const ransomwareVictimSchema = z.object({
 
 export type RansomwareVictim = z.infer<typeof ransomwareVictimSchema>
 
+export const urlhausEntrySchema = z.object({
+  id: z.string(),
+  urlid: z.string().optional(),
+  url: z.string(),
+  url_status: z.string().optional(),
+  host: z.string().optional(),
+  date_added: z.string(),
+  threat: z.string().optional(),
+  reporter: z.string().optional(),
+  tags: z.array(z.string()).nullable().optional(),
+})
+
+export type URLhausEntry = z.infer<typeof urlhausEntrySchema>
+
+export const mbSampleSchema = z.object({
+  sha256_hash: z.string(),
+  file_name: z.string().optional(),
+  file_type: z.string().optional(),
+  signature: z.string().optional(),
+  tags: z.array(z.string()).nullable().optional(),
+  reporter: z.string().optional(),
+  first_seen: z.string(),
+})
+
+export type MBSample = z.infer<typeof mbSampleSchema>
+
 export const dshieldPortSchema = z.object({
   rank: z.number(),
   targetport: z.number(),
@@ -71,6 +97,30 @@ export const isValidRansomwareVictim = (
   return ransomwareVictimSchema.safeParse(data).success
 }
 
+export function isValidURLhausEntry(data: unknown): data is URLhausEntry {
+  const result = urlhausEntrySchema.safeParse(data)
+  if (!result.success) {
+    console.error('URLHaus parsing failed:', result.error)
+  }
+  return result.success
+}
+
+export function isValidMBSample(data: unknown): data is MBSample {
+  const result = mbSampleSchema.safeParse(data)
+  if (!result.success) {
+    console.error('MBSample parsing failed:', result.error)
+  }
+  return result.success
+}
+
+export function isValidURLhausEntryList(data: unknown): data is URLhausEntry[] {
+  return z.array(urlhausEntrySchema).safeParse(data).success
+}
+
+export function isValidMBSampleList(data: unknown): data is MBSample[] {
+  return z.array(mbSampleSchema).safeParse(data).success
+}
+
 export const isValidDShieldData = (data: unknown): data is DShieldData => {
   if (data === null || data === undefined || typeof data !== 'object')
     return false
@@ -82,6 +132,8 @@ const bgpHijackEnrichmentSchema = z.object({
   abuse_confidence: z.number().optional(),
   isp: z.string().optional(),
   checked_ip: z.string().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
 })
 
 export const bgpHijackSchema = z.object({

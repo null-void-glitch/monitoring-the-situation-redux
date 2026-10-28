@@ -32,8 +32,21 @@ export default function App(): React.ReactElement {
         }}
       />
       {devtoolsOpen && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99999, height: '50vh', background: 'var(--bg)', borderTop: '1px solid var(--fg-4)' }}>
-          <ReactQueryDevtoolsPanel onClose={() => useUIStore.getState().setDevtoolsOpen(false)} />
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 99999,
+            height: '50vh',
+            background: 'var(--bg)',
+            borderTop: '1px solid var(--fg-4)',
+          }}
+        >
+          <ReactQueryDevtoolsPanel
+            onClose={() => useUIStore.getState().setDevtoolsOpen(false)}
+          />
         </div>
       )}
     </QueryClientProvider>

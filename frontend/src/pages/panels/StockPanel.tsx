@@ -15,13 +15,17 @@ interface StockPanelProps {
   subtitle: string
 }
 
-export function StockPanel({ symbol, title, subtitle }: StockPanelProps): React.ReactElement {
+export function StockPanel({
+  symbol,
+  title,
+  subtitle,
+}: StockPanelProps): React.ReactElement {
   const { data: indices } = useStockIndices()
   const indexData = indices?.find((i) => i.symbol === symbol)
-  
+
   const priceNum = indexData ? indexData.price : null
   const pct1h = indexData ? indexData.changePct : null
-  
+
   const { dir: flashDir, key: flashKey } = usePriceFlash(priceNum)
 
   const priceClass = [
@@ -91,9 +95,18 @@ function fmtPrice(n: number | null): string {
   })
 }
 
-export const NasdaqPanel = () => <StockPanel symbol="^IXIC" title="NASDAQ" subtitle="INDEX" />
-export const DaxPanel = () => <StockPanel symbol="^GDAXI" title="DAX" subtitle="INDEX" />
-export const FtsePanel = () => <StockPanel symbol="^FTSE" title="FTSE 100" subtitle="INDEX" />
-export const NikkeiPanel = () => <StockPanel symbol="^N225" title="NIKKEI 225" subtitle="INDEX" />
-export const HangSengPanel = () => <StockPanel symbol="^HSI" title="HANG SENG" subtitle="INDEX" />
-
+export const NasdaqPanel = () => (
+  <StockPanel symbol="^IXIC" title="NASDAQ" subtitle="INDEX" />
+)
+export const DaxPanel = () => (
+  <StockPanel symbol="^GDAXI" title="DAX" subtitle="INDEX" />
+)
+export const FtsePanel = () => (
+  <StockPanel symbol="^FTSE" title="FTSE 100" subtitle="INDEX" />
+)
+export const NikkeiPanel = () => (
+  <StockPanel symbol="^N225" title="NIKKEI 225" subtitle="INDEX" />
+)
+export const HangSengPanel = () => (
+  <StockPanel symbol="^HSI" title="HANG SENG" subtitle="INDEX" />
+)

@@ -21,19 +21,61 @@ import {
   isValidInternetOutage,
   isValidIssPosition,
   isValidKevEntry,
+  isValidMBSample,
+  isValidMBSampleList,
   isValidRansomwareVictim,
+  isValidRssFeed,
+  isValidRssFeedList,
+  isValidURLhausEntry,
+  isValidURLhausEntryList,
   isValidWikiItn,
   isValidWikiItnList,
   type KevEntry,
+  type MBSample,
   type RansomwareVictim,
-  type WikiItn,
-  isValidRssFeed,
-  isValidRssFeedList,
   type RssFeed,
+  type URLhausEntry,
+  type WikiItn,
 } from '@/api/types'
 import { browserDriver, createDashboardWS, type WSEvent } from '@/api/ws'
 import { unlockOnFirstGesture } from '@/lib/audio'
-import { getCentroid } from '@/lib/countryCentroids'
+import { COUNTRY_CENTROIDS, getCentroid } from '@/lib/countryCentroids'
+import { useIssHistoryStore } from '@/stores/issHistory'
+
+const COUNTRY_KEYS = Object.keys(COUNTRY_CENTROIDS)
+
+function getRandomLandCoordinates() {
+  const randomCountry =
+    COUNTRY_KEYS[Math.floor(Math.random() * COUNTRY_KEYS.length)]
+  const c = getCentroid(randomCountry)!
+  return {
+    lat: c.lat + (Math.random() - 0.5) * 5,
+    lng: c.lng + (Math.random() - 0.5) * 5,
+  }
+}
+
+function getUrlhausCoordinates(url: string) {
+  try {
+    const hostname = new URL(url).hostname
+    const parts = hostname.split('.')
+    if (parts.length > 1) {
+      const tld = parts.pop()?.toUpperCase()
+      if (tld) {
+        const c = getCentroid(tld)
+        if (c) {
+          return {
+            lat: c.lat + (Math.random() - 0.5) * 2,
+            lng: c.lng + (Math.random() - 0.5) * 2,
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // Ignore invalid urls
+  }
+  return getRandomLandCoordinates()
+}
+
 import { useBgpHijackStore } from '@/stores/bgpHijack'
 import { useCveStore } from '@/stores/cve'
 import { useEarthquakeStore } from '@/stores/earthquake'
@@ -41,10 +83,12 @@ import { type SourceKey, useFreshness } from '@/stores/freshness'
 import { useGlobeEvents } from '@/stores/globeEvents'
 import { useHeartbeat } from '@/stores/heartbeat'
 import { useKevStore } from '@/stores/kev'
+import { useMalwareBazaarStore } from '@/stores/malwarebazaar'
 import { useOutageStore } from '@/stores/outage'
 import { usePrices } from '@/stores/prices'
 import { useRansomwareStore, victimKey } from '@/stores/ransomware'
 import { useTicker } from '@/stores/ticker'
+import { useURLhausStore } from '@/stores/urlhaus'
 
 const ALL_TOPICS: readonly string[] = [
   'heartbeat',
@@ -61,6 +105,8 @@ const ALL_TOPICS: readonly string[] = [
   'gdelt_spike',
   'iss_position',
   'rss_feed',
+  'urlhaus_url',
+  'malwarebazaar_sample',
 ]
 
 const WS_URL = '/api/v1/ws'
@@ -153,6 +199,18 @@ function dispatchEvent(
         pingCoinbaseChannel(data.symbol, ping)
       }
       break
+    case 'urlhaus_url':
+      if (isValidURLhausEntry(data)) {
+        handleUrlhaus(data)
+        ping('urlhaus')
+      }
+      break
+    case 'malwarebazaar_sample':
+      if (isValidMBSample(data)) {
+        handleMalwareBazaar(data)
+        ping('malwarebazaar')
+      }
+      break
     case 'earthquake':
       if (isValidEarthquakePayload(data)) {
         handleEarthquake(data)
@@ -243,6 +301,69 @@ function handleRansomware(p: RansomwareVictim): void {
   })
 }
 
+export async function pushUrlhausPoint(
+  p: URLhausEntry & { ipLat?: number; ipLng?: number; ipCountry?: string }
+): Promise<void> {
+  let coords =
+    typeof p.ipLat === 'number' && typeof p.ipLng === 'number'
+      ? { lat: p.ipLat, lng: p.ipLng }
+      : null
+
+  if (!coords) {
+    try {
+      const hostname = new URL(p.url).hostname
+      if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
+        const res = await fetch(
+          `http://ip-api.com/json/${hostname}?fields=lat,lon,countryCode`
+        )
+        if (res.ok) {
+          const data = await res.json()
+          if (typeof data.lat === 'number' && typeof data.lon === 'number') {
+            coords = { lat: data.lat, lng: data.lon }
+            p.ipLat = data.lat
+            p.ipLng = data.lon
+            p.ipCountry = data.countryCode
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!coords) {
+    coords = getUrlhausCoordinates(p.url)
+  }
+
+  useGlobeEvents.getState().pushPoint({
+    id: `uh-point-${p.id}`,
+    type: 'urlhaus',
+    lat: coords.lat,
+    lng: coords.lng,
+    emittedAt: Date.now(),
+    meta: { url: p.url },
+  })
+}
+
+export function handleUrlhaus(p: URLhausEntry): void {
+  useURLhausStore.getState().push(p)
+  useTicker.getState().push({
+    id: `uh-tick-${p.id}`,
+    source: 'URLHAUS',
+    headline: `Threat URL: ${p.url}`,
+    ts: Date.now(),
+  })
+  pushUrlhausPoint(p)
+}
+
+export function handleMalwareBazaar(p: MBSample): void {
+  useMalwareBazaarStore.getState().push(p)
+  useTicker.getState().push({
+    id: `mb-tick-${p.sha256_hash}`,
+    source: 'BAZAAR',
+    headline: `Sample: ${p.file_name || p.sha256_hash.substring(0, 12)}`,
+    ts: Date.now(),
+  })
+}
+
 export function pushRansomwarePoint(p: RansomwareVictim): void {
   if (!p.country) return
   const c = getCentroid(p.country)
@@ -253,7 +374,11 @@ export function pushRansomwarePoint(p: RansomwareVictim): void {
     lat: c.lat + (Math.random() - 0.5) * 5,
     lng: c.lng + (Math.random() - 0.5) * 5,
     emittedAt: Date.now(),
-    meta: { group_name: p.group_name, post_title: p.post_title, country: p.country },
+    meta: {
+      group_name: p.group_name,
+      post_title: p.post_title,
+      country: p.country,
+    },
   })
 }
 
@@ -275,11 +400,11 @@ function pushOutagePoints(p: InternetOutage): void {
       lat: c.lat + (Math.random() - 0.5) * 5,
       lng: c.lng + (Math.random() - 0.5) * 5,
       emittedAt: now,
-      meta: { 
-        reason: p.reason, 
-        type: p.outageType, 
+      meta: {
+        reason: p.reason,
+        type: p.outageType,
         country: loc,
-        asnsCount: p.asns?.length ?? 0 
+        asnsCount: p.asns?.length ?? 0,
       },
     })
   }
@@ -302,17 +427,31 @@ function handleHijack(p: BgpHijack, queryClient: QueryClient): void {
 
 export function pushHijackPoint(p: BgpHijack): void {
   const country = p.enrichment?.country
-  if (!country) return
+  if (!country && (!p.enrichment?.lat || !p.enrichment?.lng)) return
   if ((p.confidence_score ?? 0) < 8) return
   if (p.duration && p.duration > 0) return
 
-  const c = getCentroid(country)
-  if (!c) return
+  let lat: number | undefined
+  let lng: number | undefined
+
+  if (p.enrichment?.lat !== undefined && p.enrichment?.lng !== undefined) {
+    lat = p.enrichment.lat + (Math.random() - 0.5) * 0.5
+    lng = p.enrichment.lng + (Math.random() - 0.5) * 0.5
+  } else if (country) {
+    const c = getCentroid(country)
+    if (c) {
+      lat = c.lat + (Math.random() - 0.5) * 5
+      lng = c.lng + (Math.random() - 0.5) * 5
+    }
+  }
+
+  if (lat === undefined || lng === undefined) return
+
   useGlobeEvents.getState().pushPoint({
     id: `hijack-${p.id}`,
     type: 'hijack',
-    lat: c.lat + (Math.random() - 0.5) * 5,
-    lng: c.lng + (Math.random() - 0.5) * 5,
+    lat,
+    lng,
     emittedAt: Date.now(),
     meta: {
       asn: p.hijacker_asn,
@@ -354,7 +493,12 @@ function pushScanPoints(p: DShieldData): void {
       lat,
       lng,
       emittedAt: now,
-      meta: { source: src.source, reports: src.reports, targets: src.targets, country: src.country },
+      meta: {
+        source: src.source,
+        reports: src.reports,
+        targets: src.targets,
+        country: src.country,
+      },
     })
   }
 }
@@ -418,13 +562,7 @@ function handleEarthquake(p: EarthquakePayload): void {
 }
 
 function handleIss(p: IssPosition, queryClient: QueryClient): void {
-  useGlobeEvents.getState().pushPoint({
-    id: 'iss-current',
-    type: 'iss',
-    lat: p.latitude,
-    lng: p.longitude,
-    emittedAt: Date.now(),
-  })
+  useIssHistoryStore.getState().pushPosition(p.latitude, p.longitude, 0.08)
   mergeIntoSnapshot(queryClient, 'iss_position', p)
 }
 
@@ -479,7 +617,7 @@ function seedGlobeFromSnapshot(snap: Snapshot): void {
       const lng = coords[0]
       const lat = coords[1]
       const mag = eq.properties?.mag ?? 0
-      if (typeof lat === 'number' && typeof lng === 'number' && mag > 4.5) {
+      if (typeof lat === 'number' && typeof lng === 'number' && mag > 5) {
         useGlobeEvents.getState().pushPoint({
           id: `eq-${eq.id}`,
           type: 'earthquake',
@@ -494,13 +632,7 @@ function seedGlobeFromSnapshot(snap: Snapshot): void {
 
   const iss = snap.iss_position
   if (isValidIssPosition(iss)) {
-    useGlobeEvents.getState().pushPoint({
-      id: 'iss-current',
-      type: 'iss',
-      lat: iss.latitude,
-      lng: iss.longitude,
-      emittedAt: Date.now(),
-    })
+    useIssHistoryStore.getState().pushPosition(iss.latitude, iss.longitude, 0.08)
   }
 
   const rw = snap.ransomware_victim
@@ -512,6 +644,20 @@ function seedGlobeFromSnapshot(snap: Snapshot): void {
       headline: `${rw.group_name} · ${rw.post_title}`,
       ts: Date.now(),
     })
+  }
+
+  const uh = snap.urlhaus_url
+  if (isValidURLhausEntry(uh)) {
+    handleUrlhaus(uh)
+  } else if (isValidURLhausEntryList(uh)) {
+    uh.forEach(handleUrlhaus)
+  }
+
+  const mb = snap.malwarebazaar_sample
+  if (isValidMBSample(mb)) {
+    handleMalwareBazaar(mb)
+  } else if (isValidMBSampleList(mb)) {
+    mb.forEach(handleMalwareBazaar)
   }
 
   const outage = snap.internet_outage

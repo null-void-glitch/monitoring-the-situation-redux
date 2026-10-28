@@ -48,10 +48,12 @@ type Enricher interface {
 }
 
 type Enrichment struct {
-	Country         string `json:"country,omitempty"`
-	AbuseConfidence int    `json:"abuse_confidence,omitempty"`
-	ISP             string `json:"isp,omitempty"`
-	CheckedIP       string `json:"checked_ip,omitempty"`
+	Country         string   `json:"country,omitempty"`
+	AbuseConfidence int      `json:"abuse_confidence,omitempty"`
+	ISP             string   `json:"isp,omitempty"`
+	CheckedIP       string   `json:"checked_ip,omitempty"`
+	Lat             *float64 `json:"lat,omitempty"`
+	Lng             *float64 `json:"lng,omitempty"`
 }
 
 type EnrichedHijack struct {
@@ -211,6 +213,8 @@ func (c *Collector) tickHijacks(ctx context.Context) (int64, error) {
 						AbuseConfidence: v.AbuseConfidence,
 						ISP:             v.ISP,
 						CheckedIP:       ip,
+						Lat:             v.Lat,
+						Lng:             v.Lng,
 					}
 				}
 			}

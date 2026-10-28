@@ -14,10 +14,18 @@ import { EarthquakePanel } from '@/pages/panels/EarthquakePanel'
 import { ETHPanel } from '@/pages/panels/ETHPanel'
 import { ISSPanel } from '@/pages/panels/ISSPanel'
 import { KEVPanel } from '@/pages/panels/KEVPanel'
+import { MalwareBazaarPanel } from '@/pages/panels/MalwareBazaarPanel'
 import { OutagePanel } from '@/pages/panels/OutagePanel'
 import { RansomwarePanel } from '@/pages/panels/RansomwarePanel'
 import { SpaceWeatherPanel } from '@/pages/panels/SpaceWeatherPanel'
-import { DaxPanel, FtsePanel, HangSengPanel, NasdaqPanel, NikkeiPanel } from '@/pages/panels/StockPanel'
+import {
+  DaxPanel,
+  FtsePanel,
+  HangSengPanel,
+  NasdaqPanel,
+  NikkeiPanel,
+} from '@/pages/panels/StockPanel'
+import { URLhausPanel } from '@/pages/panels/URLhausPanel'
 import { WikiPanel } from '@/pages/panels/WikiPanel'
 
 export type PanelId =
@@ -38,6 +46,8 @@ export type PanelId =
   | 'kev'
   | 'ransomware'
   | 'dshield'
+  | 'urlhaus'
+  | 'malwarebazaar'
 
 export interface PanelDef {
   id: PanelId
@@ -72,6 +82,12 @@ export const PANELS: Record<PanelId, PanelDef> = {
     Component: RansomwarePanel,
   },
   dshield: { id: 'dshield', label: 'DShield', Component: DShieldPanel },
+  urlhaus: { id: 'urlhaus', label: 'URLhaus', Component: URLhausPanel },
+  malwarebazaar: {
+    id: 'malwarebazaar',
+    label: 'MalwareBazaar',
+    Component: MalwareBazaarPanel,
+  },
 }
 
 // Default layout — mirrors the original hardcoded Dashboard arrangement.
@@ -95,6 +111,8 @@ export const DEFAULT_RIGHT: PanelId[] = [
   'kev',
   'ransomware',
   'dshield',
+  'urlhaus',
+  'malwarebazaar',
 ]
 
 export const ALL_PANEL_IDS: PanelId[] = [...DEFAULT_LEFT, ...DEFAULT_RIGHT]

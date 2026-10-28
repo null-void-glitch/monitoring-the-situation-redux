@@ -82,7 +82,11 @@ export function CVEVelocityPanel(): React.ReactElement {
           {recent.map((c) => (
             <tr key={c.CveID}>
               <td className={styles.cveId}>
-                <a href={`https://nvd.nist.gov/vuln/detail/${c.CveID}`} target="_blank" rel="noreferrer noopener">
+                <a
+                  href={`https://nvd.nist.gov/vuln/detail/${c.CveID}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
                   {c.CveID}
                 </a>
               </td>

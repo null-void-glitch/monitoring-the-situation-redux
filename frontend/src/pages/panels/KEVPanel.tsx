@@ -42,7 +42,15 @@ export function KEVPanel(): React.ReactElement {
         <tbody>
           {recent.map((k) => (
             <tr key={k.cveID}>
-              <td className={styles.cveId}>{k.cveID}</td>
+              <td className={styles.cveId}>
+                <a
+                  href={`https://nvd.nist.gov/vuln/detail/${k.cveID}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {k.cveID}
+                </a>
+              </td>
               <td className={styles.vp}>
                 {k.vendorProject} · {k.product}
               </td>

@@ -6,9 +6,8 @@ import { useEffect } from 'react'
 import { type BgpHijack, isValidBgpHijack } from '@/api/types'
 import { API_ENDPOINTS, QUERY_KEYS } from '@/config'
 import { apiClient } from '@/core/api'
-import { useBgpHijackStore } from '@/stores/bgpHijack'
-
 import { pushHijackPoint } from '@/pages/dashboard/lifecycle'
+import { useBgpHijackStore } from '@/stores/bgpHijack'
 
 interface BgpHijackData {
   items: BgpHijack[]

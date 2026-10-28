@@ -1,21 +1,20 @@
 // ©AngelaMos | 2026
 // threatParticles.ts
 
-// @ts-ignore
 import * as THREE from 'three'
 import type { GlobePoint } from '@/stores/globeEvents'
 
-const MAX_PARTICLES = 3000
+const MAX_PARTICLES = 2000
 const GLOBE_RADIUS = 100
 
 // Major BGP hubs to simulate traffic flow to/from
 const HUBS = [
   { lat: 39.04, lng: -77.48 }, // Ashburn
-  { lat: 50.11, lng: 8.68 },   // Frankfurt
+  { lat: 50.11, lng: 8.68 }, // Frankfurt
   { lat: 35.67, lng: 139.65 }, // Tokyo
-  { lat: 51.50, lng: -0.12 },  // London
-  { lat: 1.35, lng: 103.81 },  // Singapore
-  { lat: -33.86, lng: 151.20 },// Sydney
+  { lat: 51.5, lng: -0.12 }, // London
+  { lat: 1.35, lng: 103.81 }, // Singapore
+  { lat: -33.86, lng: 151.2 }, // Sydney
 ]
 
 const vertexShader = `
@@ -78,6 +77,20 @@ void main() {
 }
 `
 
+export interface ParticleColors {
+  hijack: string
+  scan: string
+  urlhaus: string
+  malwarebazaar: string
+}
+
+function hexToRgb01(hex: string): [number, number, number] {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim())
+  if (!m) return [1, 1, 1]
+  const n = parseInt(m[1], 16)
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]
+}
+
 function polarToCartesian(lat: number, lng: number): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180)
   const theta = (90 - lng) * (Math.PI / 180)
@@ -113,13 +126,31 @@ export class ThreatParticleSystem {
     this.customColor = new Float32Array(MAX_PARTICLES * 3)
 
     // Initialize with zeroes
-    this.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX_PARTICLES * 3), 3))
-    this.geometry.setAttribute('startPos', new THREE.BufferAttribute(this.startPos, 3))
-    this.geometry.setAttribute('endPos', new THREE.BufferAttribute(this.endPos, 3))
-    this.geometry.setAttribute('arcHeight', new THREE.BufferAttribute(this.arcHeight, 1))
-    this.geometry.setAttribute('startTime', new THREE.BufferAttribute(this.startTime, 1))
+    this.geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(MAX_PARTICLES * 3), 3)
+    )
+    this.geometry.setAttribute(
+      'startPos',
+      new THREE.BufferAttribute(this.startPos, 3)
+    )
+    this.geometry.setAttribute(
+      'endPos',
+      new THREE.BufferAttribute(this.endPos, 3)
+    )
+    this.geometry.setAttribute(
+      'arcHeight',
+      new THREE.BufferAttribute(this.arcHeight, 1)
+    )
+    this.geometry.setAttribute(
+      'startTime',
+      new THREE.BufferAttribute(this.startTime, 1)
+    )
     this.geometry.setAttribute('speed', new THREE.BufferAttribute(this.speed, 1))
-    this.geometry.setAttribute('customColor', new THREE.BufferAttribute(this.customColor, 3))
+    this.geometry.setAttribute(
+      'customColor',
+      new THREE.BufferAttribute(this.customColor, 3)
+    )
 
     this.geometry.setDrawRange(0, 0)
 
@@ -135,7 +166,7 @@ export class ThreatParticleSystem {
     })
 
     this.points = new THREE.Points(this.geometry, this.material)
-    
+
     // WebGL vertex-shader displacement requires disabling frustum culling,
     // otherwise Three.js culls the object when the original (0,0,0) bounding box is out of view.
     this.points.frustumCulled = false
@@ -147,15 +178,28 @@ export class ThreatParticleSystem {
     this.material.uniforms.uTime.value = performance.now() / 1000.0
   }
 
-  syncEvents = (hijacks: GlobePoint[], scans: GlobePoint[]) => {
+  syncEvents = (
+    hijacks: GlobePoint[],
+    scans: GlobePoint[],
+    urlhaus: GlobePoint[] = [],
+    malwarebazaar: GlobePoint[] = [],
+    colors: ParticleColors = {
+      hijack: '#916cad',
+      scan: '#466b5a',
+      urlhaus: '#dc7d68',
+      malwarebazaar: '#dc7d68',
+    }
+  ) => {
     let idx = 0
     const now = performance.now() / 1000.0
 
     const addParticles = (
-      pts: GlobePoint[], 
-      getCount: (p: GlobePoint) => number, 
+      pts: GlobePoint[],
+      getCount: (p: GlobePoint) => number,
       getDest: (p: GlobePoint, i: number) => THREE.Vector3,
-      r: number, g: number, b: number,
+      r: number,
+      g: number,
+      b: number,
       maxLimit: number
     ) => {
       let typeIdx = 0
@@ -166,7 +210,11 @@ export class ThreatParticleSystem {
         const particlesForThis = getCount(p)
         const source = polarToCartesian(p.lat, p.lng)
 
-        for (let i = 0; i < particlesForThis && typeIdx < maxLimit && idx < MAX_PARTICLES; i++) {
+        for (
+          let i = 0;
+          i < particlesForThis && typeIdx < maxLimit && idx < MAX_PARTICLES;
+          i++
+        ) {
           const dest = getDest(p, i)
 
           this.startPos[idx * 3] = source.x
@@ -194,17 +242,16 @@ export class ThreatParticleSystem {
       }
     }
 
-    // Hijacks: Red (#ef4444) -> 239, 68, 68
+    // Hijacks: tinted to match the hijack blip color
+    const [hr, hg, hb] = hexToRgb01(colors.hijack)
     addParticles(
       hijacks,
       (p) => {
         const score = (p.meta?.confidenceScore as number) ?? 10
-        // Hijacks are critical and rare, they deserve a massive red stream.
-        // If score is out of 10 (e.g. 7), this gives 150 + 7*15 = 255 particles
-        // If score is out of 100 (e.g. 90), this maxes out at 150 + 200 = 350 particles
-        return 150 + Math.min(200, score * 15)
+        // Reduced particle count for performance
+        return 50 + Math.min(100, score * 8)
       },
-      (p, i) => {
+      (_p, i) => {
         const hub = HUBS[i % HUBS.length]
         const dest = polarToCartesian(hub.lat, hub.lng)
         dest.x += (Math.random() - 0.5) * 0.2
@@ -212,14 +259,21 @@ export class ThreatParticleSystem {
         dest.z += (Math.random() - 0.5) * 0.2
         return dest.normalize()
       },
-      239 / 255, 68 / 255, 68 / 255,
-      1500
+      hr,
+      hg,
+      hb,
+      600
     )
 
-    // Scans: Blue (#60a5fa) -> 96, 165, 250
+    // Scans: tinted to match the scan blip color
+    const [sr, sg, sb] = hexToRgb01(colors.scan)
     addParticles(
       scans,
-      (p) => Math.max(1, Math.min(100, Math.floor(((p.meta?.reports as number) ?? 10) / 10))),
+      (p) =>
+        Math.max(
+          1,
+          Math.min(50, Math.floor(((p.meta?.reports as number) ?? 10) / 10))
+        ),
       (p, i) => {
         const targets = (p.meta?.targets as number) ?? 1
 
@@ -232,8 +286,8 @@ export class ThreatParticleSystem {
           dest.y += (Math.random() - 0.5) * 0.02
           dest.z += (Math.random() - 0.5) * 0.02
           return dest.normalize()
-        } 
-        
+        }
+
         // Wide scan: completely random scatter
         if (targets >= 50) {
           const dest = new THREE.Vector3(
@@ -252,8 +306,46 @@ export class ThreatParticleSystem {
         dest.z += (Math.random() - 0.5) * 0.4
         return dest.normalize()
       },
-      96 / 255, 165 / 255, 250 / 255,
-      1500
+      sr,
+      sg,
+      sb,
+      600
+    )
+
+    // URLhaus: tinted to match the malicious-IPs blip color
+    const [ur, ug, ub] = hexToRgb01(colors.urlhaus)
+    addParticles(
+      urlhaus,
+      () => 7,
+      (p) => {
+        const dest = polarToCartesian(p.lat, p.lng)
+        dest.x += (Math.random() - 0.5) * 0.1
+        dest.y += (Math.random() - 0.5) * 0.1
+        dest.z += (Math.random() - 0.5) * 0.1
+        return dest.normalize()
+      },
+      ur,
+      ug,
+      ub,
+      400
+    )
+
+    // MalwareBazaar: tinted to match the malicious-IPs blip color
+    const [mr, mg, mb] = hexToRgb01(colors.malwarebazaar)
+    addParticles(
+      malwarebazaar,
+      () => 7,
+      (p) => {
+        const dest = polarToCartesian(p.lat, p.lng)
+        dest.x += (Math.random() - 0.5) * 0.1
+        dest.y += (Math.random() - 0.5) * 0.1
+        dest.z += (Math.random() - 0.5) * 0.1
+        return dest.normalize()
+      },
+      mr,
+      mg,
+      mb,
+      400
     )
 
     this.activeCount = idx

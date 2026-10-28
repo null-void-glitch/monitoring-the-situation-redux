@@ -83,3 +83,14 @@
     font-size: 8px;
   }
 }
+
+.menuDivider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--fg-4);
+}
+
+.menuWide {
+  min-width: unset;
+  padding: 8px;
+}

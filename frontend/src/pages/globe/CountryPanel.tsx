@@ -5,36 +5,73 @@ import { useGlobeEvents } from '@/stores/globeEvents'
 import { useOutageStore } from '@/stores/outage'
 import { useRansomwareStore } from '@/stores/ransomware'
 import { useTicker } from '@/stores/ticker'
-import { type CountryFeature } from './Globe'
+import { useURLhausStore } from '@/stores/urlhaus'
 import styles from './CountryPanel.module.scss'
+import type { CountryFeature } from './Globe'
 
 interface CountryPanelProps {
   country: CountryFeature
   onClose: () => void
 }
 
-export function CountryPanel({ country, onClose }: CountryPanelProps): React.ReactElement {
+export function CountryPanel({
+  country,
+  onClose,
+}: CountryPanelProps): React.ReactElement {
   const iso2 = country.properties.ISO_A2 as string
-  const name = (country.properties.NAME || country.properties.ADMIN || iso2) as string
+  const name = (country.properties.NAME ||
+    country.properties.ADMIN ||
+    iso2) as string
 
-  const hijacks = useBgpHijackStore((s) => s.items).filter((i) => i.enrichment?.country === iso2)
-  const outages = useOutageStore((s) => s.items).filter((i) => i.locations?.includes(iso2))
-  const ransomware = useRansomwareStore((s) => s.items).filter((i) => i.country === iso2)
-  
+  const hijacks = useBgpHijackStore((s) => s.items).filter(
+    (i) => i.enrichment?.country === iso2
+  )
+  const outages = useOutageStore((s) => s.items).filter((i) =>
+    i.locations?.includes(iso2)
+  )
+  const ransomware = useRansomwareStore((s) => s.items).filter(
+    (i) => i.country === iso2
+  )
+
   const globePoints = useGlobeEvents((s) => s.points)
   const scans = useMemo(() => {
-    return globePoints.filter((p) => p.type === 'scan' && p.meta?.country === iso2)
+    return globePoints.filter(
+      (p) => p.type === 'scan' && p.meta?.country === iso2
+    )
   }, [globePoints, iso2])
+
+  const urlhausStore = useURLhausStore((s) => s.items)
+  const urlhaus = useMemo(() => {
+    return urlhausStore.filter((u) => {
+      if ((u as any).ipCountry === iso2) return true
+      try {
+        const hostname = new URL(u.url).hostname
+        return hostname.endsWith(`.${iso2.toLowerCase()}`)
+      } catch (e) {
+        return false
+      }
+    })
+  }, [urlhausStore, iso2])
 
   const tickerItems = useTicker((s) => s.items)
   const news = useMemo(() => {
-    return tickerItems.filter((i) => 
-      (i.source === 'Wikipedia' || i.source === 'Reuters' || i.source === 'BleepingComputer' || i.source === 'Google Project Zero') && 
-      i.headline.toLowerCase().includes(name.toLowerCase())
+    return tickerItems.filter(
+      (i) =>
+        (i.source === 'Wikipedia' ||
+          i.source === 'BBC News' ||
+          i.source === 'BleepingComputer' ||
+          i.source === 'Google Project Zero') &&
+        i.headline.toLowerCase().includes(name.toLowerCase())
     )
   }, [tickerItems, name])
 
-  const totalEvents = hijacks.length + outages.length + ransomware.length + scans.length + news.length
+  const totalEvents =
+    hijacks.length +
+    outages.length +
+    ransomware.length +
+    scans.length +
+    news.length +
+    urlhaus.length
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -47,38 +84,71 @@ export function CountryPanel({ country, onClose }: CountryPanelProps): React.Rea
         </div>
         <div className={styles.modalBody}>
           {totalEvents === 0 ? (
-            <div className={styles.emptyState}>No intelligence data available for this region.</div>
+            <div className={styles.emptyState}>
+              No intelligence data available for this region.
+            </div>
           ) : (
             <>
-              <Section 
-                title="Internet Outages" 
-                items={outages} 
-                render={(o) => <strong>{o.outageType || 'Unknown Outage'}:</strong>} 
-                suffix={(o) => ` ${o.reason || 'No reason provided'} (${o.asns?.length || 0} ASNs affected)`}
-              />
-              <Section 
-                title="BGP Hijacks" 
-                items={hijacks} 
-                render={(h) => <strong>ASN {h.hijacker_asn || 'Unknown'} {h.enrichment?.isp ? `(${h.enrichment.isp})` : ''}:</strong>}
-                suffix={(h) => ` hijacked ${h.prefixes && h.prefixes.length > 0 ? h.prefixes.join(', ') : '0 prefixes'} (Confidence: ${h.confidence_score || '?'})`} 
-              />
-              <Section 
-                title="Ransomware Victims" 
-                items={ransomware} 
-                render={(r) => r.website ? (
-                  <a href={r.website.startsWith('http') ? r.website : `https://${r.website}`} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
-                    <strong>{r.post_title}</strong>
-                  </a>
-                ) : (
-                  <strong>{r.post_title}</strong>
+              <Section
+                title="Internet Outages"
+                items={outages}
+                render={(o) => (
+                  <strong>{o.outageType || 'Unknown Outage'}:</strong>
                 )}
+                suffix={(o) =>
+                  ` ${o.reason || 'No reason provided'} (${o.asns?.length || 0} ASNs affected)`
+                }
+              />
+              <Section
+                title="BGP Hijacks"
+                items={hijacks}
+                render={(h) => (
+                  <strong>
+                    ASN {h.hijacker_asn || 'Unknown'}{' '}
+                    {h.enrichment?.isp ? `(${h.enrichment.isp})` : ''}:
+                  </strong>
+                )}
+                suffix={(h) =>
+                  ` hijacked ${h.prefixes && h.prefixes.length > 0 ? h.prefixes.join(', ') : '0 prefixes'} (Confidence: ${h.confidence_score || '?'})`
+                }
+              />
+              <Section
+                title="Ransomware Victims"
+                items={ransomware}
+                render={(r) =>
+                  r.website ? (
+                    <a
+                      href={
+                        r.website.startsWith('http')
+                          ? r.website
+                          : `https://${r.website}`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: 'inherit' }}
+                    >
+                      <strong>{r.post_title}</strong>
+                    </a>
+                  ) : (
+                    <strong>{r.post_title}</strong>
+                  )
+                }
                 suffix={(r) => (
                   <>
-                    <span style={{ color: 'var(--fg-2)', marginLeft: '4px' }}>(Actor: {r.group_name})</span>
+                    <span style={{ color: 'var(--fg-2)', marginLeft: '4px' }}>
+                      (Actor: {r.group_name})
+                    </span>
                     {r.techniques && r.techniques.length > 0 && (
-                      <span style={{ display: 'inline-flex', gap: '4px', marginLeft: '8px', verticalAlign: 'middle' }}>
-                        {r.techniques.map(t => (
-                          <a 
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          gap: '4px',
+                          marginLeft: '8px',
+                          verticalAlign: 'middle',
+                        }}
+                      >
+                        {r.techniques.map((t) => (
+                          <a
                             key={t}
                             href={`https://attack.mitre.org/techniques/${t}/`}
                             target="_blank"
@@ -92,18 +162,50 @@ export function CountryPanel({ country, onClose }: CountryPanelProps): React.Rea
                       </span>
                     )}
                   </>
-                )} 
+                )}
               />
-              <Section 
-                title="Active Scanning (Top IPs)" 
-                items={scans} 
-                render={(s) => <strong>Source IP {s.meta?.source}:</strong>}
-                suffix={(s) => ` ${s.meta?.reports} reports across ${s.meta?.targets} targets`} 
+              <Section
+                title="Active Scanning (Top IPs)"
+                items={scans}
+                render={(s) => (
+                  <strong>Source IP {String(s.meta?.source)}:</strong>
+                )}
+                suffix={(s) =>
+                  ` ${s.meta?.reports} reports across ${s.meta?.targets} targets`
+                }
               />
-              <Section 
-                title="Local News & Intel" 
-                items={news} 
-                render={(n) => n.href ? <a href={n.href} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>{n.headline}</a> : <span>{n.headline}</span>}
+              <Section
+                title="Malicious URLs (URLhaus)"
+                items={urlhaus}
+                render={(u) => (
+                  <a
+                    href={u.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: 'inherit' }}
+                  >
+                    <strong>{u.url}</strong>
+                  </a>
+                )}
+                suffix={(u) => ` (${u.threat || 'Unknown Threat'})`}
+              />
+              <Section
+                title="Local News & Intel"
+                items={news}
+                render={(n) =>
+                  n.href ? (
+                    <a
+                      href={n.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: 'inherit' }}
+                    >
+                      {n.headline}
+                    </a>
+                  ) : (
+                    <span>{n.headline}</span>
+                  )
+                }
                 suffix={() => ''}
               />
             </>
@@ -114,7 +216,17 @@ export function CountryPanel({ country, onClose }: CountryPanelProps): React.Rea
   )
 }
 
-function Section<T>({ title, items, render, suffix }: { title: string, items: T[], render: (item: T) => React.ReactNode, suffix: (item: T) => React.ReactNode }) {
+function Section<T>({
+  title,
+  items,
+  render,
+  suffix,
+}: {
+  title: string
+  items: T[]
+  render: (item: T) => React.ReactNode
+  suffix: (item: T) => React.ReactNode
+}) {
   if (items.length === 0) return null
   return (
     <div className={styles.section}>

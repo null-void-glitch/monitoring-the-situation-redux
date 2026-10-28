@@ -43,6 +43,8 @@ export const API_ENDPOINTS = {
     HIJACKS: `/${API_VERSION}/intel/hijacks`,
     OUTAGES: `/${API_VERSION}/intel/outages`,
     RANSOMWARE: `/${API_VERSION}/intel/ransomware`,
+    URLHAUS: `/${API_VERSION}/intel/urlhaus`,
+    MALWAREBAZAAR: `/${API_VERSION}/intel/malwarebazaar`,
     QUAKES: `/${API_VERSION}/intel/quakes`,
     FINANCE: `/${API_VERSION}/intel/finance`,
   },
@@ -80,6 +82,8 @@ export const QUERY_KEYS = {
     HIJACKS: () => [...QUERY_KEYS.INTEL.ALL, 'hijacks'] as const,
     OUTAGES: () => [...QUERY_KEYS.INTEL.ALL, 'outages'] as const,
     RANSOMWARE: () => [...QUERY_KEYS.INTEL.ALL, 'ransomware'] as const,
+    URLHAUS: () => [...QUERY_KEYS.INTEL.ALL, 'urlhaus'] as const,
+    MALWAREBAZAAR: () => [...QUERY_KEYS.INTEL.ALL, 'malwarebazaar'] as const,
     QUAKES: () => [...QUERY_KEYS.INTEL.ALL, 'quakes'] as const,
   },
 } as const

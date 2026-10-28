@@ -37,6 +37,8 @@ import (
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/state"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/swpc"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/tor"
+	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/urlhaus"
+	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/malwarebazaar"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/usgs"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/wikipedia"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/config"
@@ -59,23 +61,41 @@ const (
 	drainDelay = 5 * time.Second
 )
 
-type abuseipdbEnricher struct {
-	client *abuseipdb.Client
+type compositeCFRadarEnricher struct {
+	abuse *abuseipdb.Client
+	ipapi *ipapi.Client
 }
 
-func (a abuseipdbEnricher) Lookup(
+func (c compositeCFRadarEnricher) Lookup(
 	ctx context.Context,
 	ip string,
 ) (cfradar.Enrichment, error) {
-	v, err := a.client.Lookup(ctx, ip)
-	if err != nil {
-		return cfradar.Enrichment{}, err
+	out := cfradar.Enrichment{}
+	var hasData bool
+	
+	if c.abuse != nil {
+		if v, err := c.abuse.Lookup(ctx, ip); err == nil {
+			out.Country = v.CountryCode
+			out.AbuseConfidence = v.AbuseConfidenceScore
+			out.ISP = v.ISP
+			hasData = true
+		}
 	}
-	return cfradar.Enrichment{
-		Country:         v.CountryCode,
-		AbuseConfidence: v.AbuseConfidenceScore,
-		ISP:             v.ISP,
-	}, nil
+	if c.ipapi != nil {
+		if v, err := c.ipapi.Lookup(ctx, ip); err == nil {
+			out.Lat = &v.Lat
+			out.Lng = &v.Lon
+			if out.Country == "" {
+				out.Country = v.CountryCode
+			}
+			hasData = true
+		}
+	}
+	
+	if !hasData {
+		return out, errors.New("enrichment lookup failed")
+	}
+	return out, nil
 }
 
 type compositeDshieldEnricher struct {
@@ -292,13 +312,17 @@ func run(configPath string) error {
 	kevRepo := kev.NewRepo(db.DB)
 	cfradarRepo := cfradar.NewRepo(db.DB)
 	ransomwareRepo := ransomware.NewRepo(db.DB)
+	urlhausRepo := urlhaus.NewRepo(db.DB)
+	mbRepo := malwarebazaar.NewRepo(db.DB)
 	usgsRepo := usgs.NewRepo(db.DB)
 	intelHandler := intel.NewHandler(intel.HandlerConfig{
-		CVE:        cveRepo,
-		KEV:        kevRepo,
-		CFRadar:    cfradarRepo,
-		Ransomware: ransomwareRepo,
-		USGS:       usgsRepo,
+		CVE:           cveRepo,
+		KEV:           kevRepo,
+		CFRadar:       cfradarRepo,
+		Ransomware:    ransomwareRepo,
+		URLhaus:       urlhausRepo,
+		MalwareBazaar: mbRepo,
+		USGS:          usgsRepo,
 	})
 
 	hub := ws.NewHub(ws.HubConfig{
@@ -397,15 +421,18 @@ func run(configPath string) error {
 	}
 
 	if cfg.Collectors.CFRadar.Enabled {
-		var enricher cfradar.Enricher
+		var enricher cfradar.Enricher = compositeCFRadarEnricher{
+			ipapi: ipapi.NewClient(ipapi.ClientConfig{}),
+		}
 		if cfg.Collectors.AbuseIPDB.Enabled &&
 			cfg.Collectors.AbuseIPDB.APIKey != "" {
-			enricher = abuseipdbEnricher{
-				client: abuseipdb.NewClient(
+			enricher = compositeCFRadarEnricher{
+				abuse: abuseipdb.NewClient(
 					abuseipdb.ClientConfig{
 						APIKey: cfg.Collectors.AbuseIPDB.APIKey,
 					},
 				),
+				ipapi: ipapi.NewClient(ipapi.ClientConfig{}),
 			}
 		}
 		coll := cfradar.NewCollector(cfradar.CollectorConfig{
@@ -571,6 +598,34 @@ func run(configPath string) error {
 		collectorGroup.Go(func() error { return coll.Run(collectorCtx) })
 	}
 
+	if cfg.Collectors.URLhaus.Enabled {
+		coll := urlhaus.NewCollector(
+			urlhaus.NewClient(),
+			urlhaus.NewRepo(db.DB),
+			eventBus,
+			logger.With("collector", "urlhaus"),
+			cfg.Collectors.URLhaus.Interval,
+		)
+		collectorGroup.Go(func() error {
+			coll.Start(collectorCtx)
+			return nil
+		})
+	}
+
+	if cfg.Collectors.MalwareBazaar.Enabled {
+		coll := malwarebazaar.NewCollector(
+			malwarebazaar.NewClient(),
+			malwarebazaar.NewRepo(db.DB),
+			eventBus,
+			logger.With("collector", "malwarebazaar"),
+			cfg.Collectors.MalwareBazaar.Interval,
+		)
+		collectorGroup.Go(func() error {
+			coll.Start(collectorCtx)
+			return nil
+		})
+	}
+
 	logger.Info("collectors started",
 		"heartbeat", true,
 		"dshield", cfg.Collectors.DShield.Enabled,
@@ -586,6 +641,8 @@ func run(configPath string) error {
 		"iss", cfg.Collectors.ISS.Enabled,
 		"rss", cfg.Collectors.RSS.Enabled,
 		"tor", cfg.Collectors.Tor.Enabled,
+		"urlhaus", cfg.Collectors.URLhaus.Enabled,
+		"malwarebazaar", cfg.Collectors.MalwareBazaar.Enabled,
 	)
 
 	srv := server.New(server.Config{

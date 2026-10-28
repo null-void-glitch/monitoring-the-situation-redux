@@ -10,6 +10,8 @@ export type GlobePointType =
   | 'iss'
   | 'outage'
   | 'hijack'
+  | 'urlhaus'
+  | 'malwarebazaar'
 
 export interface GlobePoint {
   id: string

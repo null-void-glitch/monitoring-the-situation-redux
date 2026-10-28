@@ -1,8 +1,8 @@
 // ©AngelaMos | 2026
 // WikiPanel.tsx
 
-import { useState, useMemo } from 'react'
-import { FiRefreshCw, FiList, FiX } from 'react-icons/fi'
+import { useMemo, useState } from 'react'
+import { FiList, FiRefreshCw, FiX } from 'react-icons/fi'
 import { useFreshness } from '@/stores/freshness'
 import { useTicker } from '@/stores/ticker'
 import { Panel } from './Panel'
@@ -17,7 +17,7 @@ const SECONDS_PER_HOUR = 3_600
 export function WikiPanel(): React.ReactElement {
   const [refreshing, setRefreshing] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  
+
   const handleRefresh = async () => {
     setRefreshing(true)
     try {
@@ -31,14 +31,20 @@ export function WikiPanel(): React.ReactElement {
   const all = useTicker((s) => s.items)
   const allNews = useMemo(() => {
     return all
-      .filter((i) => i.source === 'Wikipedia' || i.source === 'Reuters' || i.source === 'BleepingComputer' || i.source === 'Google Project Zero')
+      .filter(
+        (i) =>
+          i.source === 'Wikipedia' ||
+          i.source === 'BBC News' ||
+          i.source === 'BleepingComputer' ||
+          i.source === 'Google Project Zero'
+      )
       .sort((a, b) => b.ts - a.ts)
   }, [all])
-  
+
   const items = useMemo(() => {
     const counts: Record<string, number> = {}
     const filtered: typeof allNews = []
-    
+
     for (const item of allNews) {
       if (!counts[item.source]) counts[item.source] = 0
       if (counts[item.source] < 2) {
@@ -47,7 +53,7 @@ export function WikiPanel(): React.ReactElement {
       }
       if (filtered.length >= MAX_ITEMS) break
     }
-    
+
     return filtered
   }, [allNews])
 
@@ -70,19 +76,19 @@ export function WikiPanel(): React.ReactElement {
 
   const headerActions = (
     <>
-      <button 
+      <button
         type="button"
-        className={styles.headerRefresh} 
-        onClick={() => setIsModalOpen(true)} 
+        className={styles.headerRefresh}
+        onClick={() => setIsModalOpen(true)}
         title="View all news"
         aria-label="View all news"
       >
         <FiList />
       </button>
-      <button 
+      <button
         type="button"
-        className={styles.headerRefresh} 
-        onClick={handleRefresh} 
+        className={styles.headerRefresh}
+        onClick={handleRefresh}
         disabled={refreshing}
         title="Fetch latest news"
         aria-label="Fetch latest news"
@@ -126,13 +132,22 @@ export function WikiPanel(): React.ReactElement {
           ))
         )}
       </div>
-      
+
       {isModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>All News Feeds</h2>
-              <button className={styles.modalClose} onClick={() => setIsModalOpen(false)}>
+              <button
+                className={styles.modalClose}
+                onClick={() => setIsModalOpen(false)}
+              >
                 <FiX />
               </button>
             </div>

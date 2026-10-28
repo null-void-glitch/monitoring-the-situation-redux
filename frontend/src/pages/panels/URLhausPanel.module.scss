@@ -1,0 +1,66 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.table thead th {
+  font-size: var(--type-label);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  text-align: left;
+  padding: var(--row-py) var(--row-px);
+  border-bottom: 1px solid var(--fg-4);
+  font-weight: 400;
+}
+.table tbody td {
+  padding: var(--row-py) var(--row-px);
+  font-size: var(--type-body);
+  color: var(--fg-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table tbody tr:hover {
+  background: var(--bg-row-hover);
+}
+.url {
+  font-family: var(--font-mono);
+  width: 45%;
+}
+.host {
+  color: var(--fg-2);
+  width: 30%;
+}
+.status {
+  width: 10%;
+  text-align: center;
+}
+.ago {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-3);
+  width: 15%;
+  text-align: right;
+}
+.flash {
+  animation: row-flash 600ms ease-out;
+}
+.tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg-2);
+  border: 1px solid var(--fg-4);
+  margin-right: 4px;
+}
+@keyframes row-flash {
+  0% {
+    background: var(--fg-4);
+  }
+  100% {
+    background: transparent;
+  }
+}

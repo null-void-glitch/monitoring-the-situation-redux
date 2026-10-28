@@ -17,6 +17,8 @@ import (
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/cve"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/kev"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/ransomware"
+	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/urlhaus"
+	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/malwarebazaar"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/collectors/usgs"
 	"github.com/carterperez-dev/monitor-the-situation/backend/internal/core"
 )
@@ -57,6 +59,14 @@ type RansomwareRepo interface {
 	Recent(ctx context.Context, limit int) ([]ransomware.Row, error)
 }
 
+type URLhausRepo interface {
+	Recent(ctx context.Context, limit int) ([]urlhaus.URLhausEntry, error)
+}
+
+type MalwareBazaarRepo interface {
+	Recent(ctx context.Context, limit int) ([]malwarebazaar.MBSample, error)
+}
+
 type USGSRepo interface {
 	RecentByTime(ctx context.Context, limit int) ([]usgs.Row, error)
 }
@@ -66,15 +76,19 @@ type Handler struct {
 	kevRepo        KEVRepo
 	cfradarRepo    CFRadarRepo
 	ransomwareRepo RansomwareRepo
+	urlhausRepo    URLhausRepo
+	mbRepo         MalwareBazaarRepo
 	usgsRepo       USGSRepo
 }
 
 type HandlerConfig struct {
-	CVE        CVERepo
-	KEV        KEVRepo
-	CFRadar    CFRadarRepo
-	Ransomware RansomwareRepo
-	USGS       USGSRepo
+	CVE           CVERepo
+	KEV           KEVRepo
+	CFRadar       CFRadarRepo
+	Ransomware    RansomwareRepo
+	URLhaus       URLhausRepo
+	MalwareBazaar MalwareBazaarRepo
+	USGS          USGSRepo
 }
 
 func NewHandler(cfg HandlerConfig) *Handler {
@@ -83,6 +97,8 @@ func NewHandler(cfg HandlerConfig) *Handler {
 		kevRepo:        cfg.KEV,
 		cfradarRepo:    cfg.CFRadar,
 		ransomwareRepo: cfg.Ransomware,
+		urlhausRepo:    cfg.URLhaus,
+		mbRepo:         cfg.MalwareBazaar,
 		usgsRepo:       cfg.USGS,
 	}
 }
@@ -94,6 +110,8 @@ func (h *Handler) RegisterRoutes(r chi.Router) {
 		r.Get("/hijacks", h.recentHijacks)
 		r.Get("/outages", h.recentOutages)
 		r.Get("/ransomware", h.recentRansomware)
+		r.Get("/urlhaus", h.recentURLhaus)
+		r.Get("/malwarebazaar", h.recentMalwareBazaar)
 		r.Get("/quakes", h.recentQuakes)
 		r.Get("/finance", h.proxyYahooFinance)
 	})
@@ -217,7 +235,36 @@ func (h *Handler) recentRansomware(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.Header().Set("Cache-Control", cacheControl)
+	w.Header().Set("Cache-Control", cacheControl)
 	core.OK(w, out)
+}
+
+func (h *Handler) recentURLhaus(w http.ResponseWriter, r *http.Request) {
+	if h.urlhausRepo == nil {
+		core.OK(w, []any{})
+		return
+	}
+	rows, err := h.urlhausRepo.Recent(r.Context(), parseLimit(r))
+	if err != nil {
+		core.InternalServerError(w, err)
+		return
+	}
+	w.Header().Set("Cache-Control", cacheControl)
+	core.OK(w, rows)
+}
+
+func (h *Handler) recentMalwareBazaar(w http.ResponseWriter, r *http.Request) {
+	if h.mbRepo == nil {
+		core.OK(w, []any{})
+		return
+	}
+	rows, err := h.mbRepo.Recent(r.Context(), parseLimit(r))
+	if err != nil {
+		core.InternalServerError(w, err)
+		return
+	}
+	w.Header().Set("Cache-Control", cacheControl)
+	core.OK(w, rows)
 }
 
 func (h *Handler) recentQuakes(w http.ResponseWriter, r *http.Request) {
